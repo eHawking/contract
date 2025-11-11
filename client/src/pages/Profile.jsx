@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { profileAPI } from '../lib/api';
-import { useAuthStore } from '../store/useAuthStore';
+import useAuthStore from '../store/useAuthStore';
 import { toast } from 'sonner';
 import { User, Mail, Building2, Phone, MapPin, Lock, Upload, Trash2, Save } from 'lucide-react';
 

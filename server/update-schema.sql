@@ -12,10 +12,11 @@ CREATE TABLE IF NOT EXISTS settings (
   FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Add profile photo column to users table
-ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_photo VARCHAR(255) DEFAULT NULL;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50) DEFAULT NULL;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS address TEXT DEFAULT NULL;
+-- Add profile photo column to users table (MariaDB compatible)
+-- These will fail if columns exist, but that's OK
+ALTER TABLE users ADD COLUMN profile_photo VARCHAR(255) DEFAULT NULL;
+ALTER TABLE users ADD COLUMN phone VARCHAR(50) DEFAULT NULL;
+ALTER TABLE users ADD COLUMN address TEXT DEFAULT NULL;
 
 -- Insert default settings
 INSERT INTO settings (setting_key, setting_value, setting_type) VALUES
