@@ -13,6 +13,8 @@ import {
   UserCircle
 } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore';
+import ThemeToggle from './ThemeToggle';
+import WelcomeModal from './WelcomeModal';
 
 function Layout({ children }) {
   const { user, logout } = useAuthStore();
@@ -41,12 +43,12 @@ function Layout({ children }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Mobile menu button */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 rounded-lg bg-white shadow-lg border border-gray-200"
+          className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700"
         >
           {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -54,7 +56,7 @@ function Layout({ children }) {
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 z-40 h-screen w-64 bg-white border-r border-gray-200 
+        fixed top-0 left-0 z-40 h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700
         transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
