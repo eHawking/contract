@@ -64,7 +64,8 @@ router.post('/login', [
         name: user.name,
         role: user.role,
         company_name: user.company_name,
-        phone: user.phone
+        phone: user.phone,
+        avatar_url: user.avatar_url || null
       }
     });
 

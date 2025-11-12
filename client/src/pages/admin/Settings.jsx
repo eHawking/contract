@@ -1,422 +1,176 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import Layout from '../../components/Layout';
 import { settingsAPI } from '../../lib/api';
 import { toast } from 'sonner';
-import { Save, Upload, Sparkles, Building2, Mail, Lock, Key } from 'lucide-react';
 
-export default function Settings() {
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('company');
-  const [settings, setSettings] = useState({});
+function AdminSettings() {
+  const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState('company');
+  const [settings, setSettings] = useState({
+    company_name: '',
+    company_address: '',
+    company_phone: '',
+    company_email: '',
+    company_website: '',
+    logo_url: '',
+    email_smtp_host: '',
+    email_smtp_port: 587,
+    email_smtp_user: '',
+    email_smtp_password: '',
+    email_smtp_secure: true,
+    gemini_api_key: '',
+    gemini_model: 'gemini-1.5-flash'
+  });
   const [logoFile, setLogoFile] = useState(null);
-  const [logoPreview, setLogoPreview] = useState(null);
 
   useEffect(() => {
-    fetchSettings();
+    load();
   }, []);
 
-  const fetchSettings = async () => {
+  const load = async () => {
     try {
-      setLoading(true);
-      const response = await settingsAPI.getAll();
-      setSettings(response.data);
-      if (response.data.company_logo) {
-        setLogoPreview(response.data.company_logo);
-      }
-    } catch (error) {
+      const { data } = await settingsAPI.get();
+      if (data.settings) setSettings({ ...settings, ...data.settings });
+    } catch (err) {
       toast.error('Failed to load settings');
-      console.error('Error loading settings:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (key, value) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
-  };
-
-  const handleLogoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setLogoFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogoPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleSave = async () => {
     try {
-      setSaving(true);
-
-      // Upload logo first if changed
-      if (logoFile) {
-        const logoResponse = await settingsAPI.uploadLogo(logoFile);
-        settings.company_logo = logoResponse.data.filePath;
-      }
-
-      // Save all settings
       await settingsAPI.update(settings);
-      toast.success('Settings saved successfully');
-      fetchSettings();
-    } catch (error) {
-      toast.error(error.response?.data?.error || 'Failed to save settings');
-      console.error('Error saving settings:', error);
-    } finally {
-      setSaving(false);
+      toast.success('Settings updated');
+      load();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to update settings');
     }
   };
 
-  const tabs = [
-    { id: 'company', label: 'Company Details', icon: Building2 },
-    { id: 'email', label: 'Email Settings', icon: Mail },
-    { id: 'ai', label: 'AI Settings', icon: Sparkles }
-  ];
+  const handleLogoUpload = async () => {
+    if (!logoFile) return toast.error('Select a logo file first');
+    try {
+      const { data } = await settingsAPI.uploadLogo(logoFile);
+      setSettings((s) => ({ ...s, logo_url: data.logo_url }));
+      toast.success('Logo updated');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Logo upload failed');
+    }
+  };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="spinner"></div>
-      </div>
+      <Layout>
+        <div className="text-center py-12 text-gray-600">Loading settings...</div>
+      </Layout>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="btn btn-primary flex items-center gap-2"
-        >
-          <Save className="w-4 h-4" />
-          {saving ? 'Saving...' : 'Save Changes'}
-        </button>
-      </div>
+    <Layout>
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">Settings</h1>
 
-      {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`
-                  flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm
-                  ${activeTab === tab.id
-                    ? 'border-primary-600 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }
-                `}
-              >
-                <Icon className="w-5 h-5" />
-                {tab.label}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
+        <div className="flex gap-2 mb-6">
+          <button className={`btn ${tab==='company'?'btn-primary':'btn-outline'}`} onClick={() => setTab('company')}>Company</button>
+          <button className={`btn ${tab==='email'?'btn-primary':'btn-outline'}`} onClick={() => setTab('email')}>Email</button>
+          <button className={`btn ${tab==='ai'?'btn-primary':'btn-outline'}`} onClick={() => setTab('ai')}>AI (Gemini)</button>
+        </div>
 
-      {/* Company Details Tab */}
-      {activeTab === 'company' && (
-        <div className="card space-y-6">
-          <h2 className="text-xl font-semibold">Company Information</h2>
-
-          {/* Logo Upload */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Company Logo
-            </label>
-            <div className="flex items-center gap-4">
-              {logoPreview && (
-                <img
-                  src={logoPreview}
-                  alt="Company logo"
-                  className="w-32 h-32 object-contain border border-gray-200 rounded-lg p-2"
-                />
-              )}
-              <div>
-                <label className="btn btn-secondary cursor-pointer flex items-center gap-2">
-                  <Upload className="w-4 h-4" />
-                  Upload Logo
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleLogoChange}
-                    className="hidden"
-                  />
-                </label>
-                <p className="text-sm text-gray-500 mt-2">
-                  PNG, JPG, SVG up to 5MB
-                </p>
+        {tab === 'company' && (
+          <div className="card space-y-6">
+            <div className="flex items-center gap-6">
+              <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                {settings.logo_url ? (
+                  <img src={settings.logo_url} alt="Logo" className="w-full h-full object-contain" />
+                ) : (
+                  <span className="text-gray-400 text-sm">No Logo</span>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                <input type="file" accept="image/*" onChange={(e)=>setLogoFile(e.target.files[0]||null)} />
+                <button className="btn btn-secondary" onClick={handleLogoUpload}>Upload</button>
               </div>
             </div>
-          </div>
 
-          {/* Company Name */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Company Name
-            </label>
-            <input
-              type="text"
-              value={settings.company_name || ''}
-              onChange={(e) => handleChange('company_name', e.target.value)}
-              className="input"
-              placeholder="Company Name"
-            />
-          </div>
-
-          {/* Address */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Address
-            </label>
-            <textarea
-              value={settings.company_address || ''}
-              onChange={(e) => handleChange('company_address', e.target.value)}
-              className="input"
-              rows={3}
-              placeholder="Company Address"
-            />
-          </div>
-
-          {/* Phone */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Phone
-            </label>
-            <input
-              type="tel"
-              value={settings.company_phone || ''}
-              onChange={(e) => handleChange('company_phone', e.target.value)}
-              className="input"
-              placeholder="+966 50 911 9859"
-            />
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              value={settings.company_email || ''}
-              onChange={(e) => handleChange('company_email', e.target.value)}
-              className="input"
-              placeholder="company@example.com"
-            />
-          </div>
-
-          {/* Website */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Website
-            </label>
-            <input
-              type="url"
-              value={settings.company_website || ''}
-              onChange={(e) => handleChange('company_website', e.target.value)}
-              className="input"
-              placeholder="www.example.com"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Email Settings Tab */}
-      {activeTab === 'email' && (
-        <div className="card space-y-6">
-          <div>
-            <h2 className="text-xl font-semibold">Email Configuration</h2>
-            <p className="text-gray-600 text-sm mt-1">
-              Configure SMTP settings for sending email notifications
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* SMTP Host */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                SMTP Host
-              </label>
-              <input
-                type="text"
-                value={settings.smtp_host || ''}
-                onChange={(e) => handleChange('smtp_host', e.target.value)}
-                className="input"
-                placeholder="mail.example.com"
-              />
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                <input className="input" value={settings.company_name||''} onChange={(e)=>setSettings({...settings, company_name:e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                <input className="input" value={settings.company_phone||''} onChange={(e)=>setSettings({...settings, company_phone:e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" className="input" value={settings.company_email||''} onChange={(e)=>setSettings({...settings, company_email:e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                <input className="input" value={settings.company_website||''} onChange={(e)=>setSettings({...settings, company_website:e.target.value})} />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                <textarea className="textarea" rows="3" value={settings.company_address||''} onChange={(e)=>setSettings({...settings, company_address:e.target.value})} />
+              </div>
             </div>
 
-            {/* SMTP Port */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                SMTP Port
-              </label>
-              <input
-                type="number"
-                value={settings.smtp_port || '587'}
-                onChange={(e) => handleChange('smtp_port', e.target.value)}
-                className="input"
-                placeholder="587"
-              />
-            </div>
-
-            {/* SMTP User */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                SMTP Username
-              </label>
-              <input
-                type="text"
-                value={settings.smtp_user || ''}
-                onChange={(e) => handleChange('smtp_user', e.target.value)}
-                className="input"
-                placeholder="username"
-              />
-            </div>
-
-            {/* SMTP Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                SMTP Password
-              </label>
-              <input
-                type="password"
-                value={settings.smtp_password || ''}
-                onChange={(e) => handleChange('smtp_password', e.target.value)}
-                className="input"
-                placeholder="Enter password to change"
-              />
-            </div>
-
-            {/* From Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                From Name
-              </label>
-              <input
-                type="text"
-                value={settings.smtp_from_name || ''}
-                onChange={(e) => handleChange('smtp_from_name', e.target.value)}
-                className="input"
-                placeholder="AEMCO Contract Builder"
-              />
-            </div>
-
-            {/* From Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                From Email
-              </label>
-              <input
-                type="email"
-                value={settings.smtp_from_email || ''}
-                onChange={(e) => handleChange('smtp_from_email', e.target.value)}
-                className="input"
-                placeholder="noreply@example.com"
-              />
-            </div>
+            <button className="btn btn-primary" onClick={handleSave}>Save Changes</button>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* AI Settings Tab */}
-      {activeTab === 'ai' && (
-        <div className="card space-y-6">
-          <div>
-            <h2 className="text-xl font-semibold flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-purple-600" />
-              AI Content Generation
-            </h2>
-            <p className="text-gray-600 text-sm mt-1">
-              Configure Google Gemini AI for automatic contract and template content generation
-            </p>
-          </div>
-
-          {/* Enable AI */}
-          <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
-            <div>
-              <h3 className="font-medium text-gray-900">Enable AI Features</h3>
-              <p className="text-sm text-gray-600">
-                Use AI to generate contract content automatically
-              </p>
+        {tab === 'email' && (
+          <div className="card space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">SMTP Host</label>
+                <input className="input" value={settings.email_smtp_host||''} onChange={(e)=>setSettings({...settings, email_smtp_host:e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">SMTP Port</label>
+                <input type="number" className="input" value={settings.email_smtp_port||''} onChange={(e)=>setSettings({...settings, email_smtp_port: Number(e.target.value)})} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">SMTP User</label>
+                <input className="input" value={settings.email_smtp_user||''} onChange={(e)=>setSettings({...settings, email_smtp_user:e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">SMTP Password</label>
+                <input type="password" className="input" value={settings.email_smtp_password||''} onChange={(e)=>setSettings({...settings, email_smtp_password:e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Use TLS/SSL</label>
+                <select className="select" value={settings.email_smtp_secure? '1':'0'} onChange={(e)=>setSettings({...settings, email_smtp_secure: e.target.value==='1'})}>
+                  <option value="1">Yes</option>
+                  <option value="0">No</option>
+                </select>
+              </div>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.ai_enabled === 'true'}
-                onChange={(e) => handleChange('ai_enabled', e.target.checked ? 'true' : 'false')}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-            </label>
+            <button className="btn btn-primary" onClick={handleSave}>Save Changes</button>
           </div>
+        )}
 
-          {/* Gemini API Key */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-              <Key className="w-4 h-4" />
-              Google Gemini API Key
-            </label>
-            <input
-              type="password"
-              value={settings.gemini_api_key || ''}
-              onChange={(e) => handleChange('gemini_api_key', e.target.value)}
-              className="input"
-              placeholder="Enter your Gemini API key"
-            />
-            <p className="text-sm text-gray-500 mt-2">
-              Get your API key from{' '}
-              <a
-                href="https://makersuite.google.com/app/apikey"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-purple-600 hover:underline"
-              >
-                Google AI Studio
-              </a>
-            </p>
+        {tab === 'ai' && (
+          <div className="card space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Gemini API Key</label>
+                <input className="input" value={settings.gemini_api_key||''} onChange={(e)=>setSettings({...settings, gemini_api_key:e.target.value})} placeholder="Enter API Key" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Model (free text)</label>
+                <input className="input" value={settings.gemini_model||'gemini-1.5-flash'} onChange={(e)=>setSettings({...settings, gemini_model:e.target.value})} placeholder="e.g., gemini-2.5-flash" />
+                <p className="text-xs text-gray-500 mt-1">Examples: gemini-1.5-flash, gemini-1.5-pro, gemini-2.5-flash (if available in your account)</p>
+              </div>
+            </div>
+            <button className="btn btn-primary" onClick={handleSave}>Save Changes</button>
           </div>
-
-          {/* Model Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Gemini Model
-            </label>
-            <select
-              value={settings.gemini_model || 'gemini-1.5-pro-latest'}
-              onChange={(e) => handleChange('gemini_model', e.target.value)}
-              className="input"
-            >
-              <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro (Latest)</option>
-              <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash (Latest)</option>
-              <option value="gemini-pro">Gemini Pro</option>
-            </select>
-            <p className="text-sm text-gray-500 mt-2">
-              Pro model for best quality, Flash for faster responses
-            </p>
-          </div>
-
-          {/* Info Box */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-medium text-blue-900 mb-2">How it works:</h4>
-            <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
-              <li>AI will help generate professional contract content</li>
-              <li>Automatically fill templates with relevant clauses</li>
-              <li>Suggest improvements to contract language</li>
-              <li>Generate content based on contract type and details</li>
-            </ul>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </Layout>
   );
 }
+
+export default AdminSettings;

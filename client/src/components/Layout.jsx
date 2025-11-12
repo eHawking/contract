@@ -9,17 +9,27 @@ import {
   Building2,
   Menu,
   X,
-  Settings,
-  UserCircle
+  User,
+  Settings
 } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore';
-import ThemeToggle from './ThemeToggle';
+import { settingsAPI } from '../lib/api';
 
 function Layout({ children }) {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [publicSettings, setPublicSettings] = React.useState(null);
+
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await settingsAPI.getPublic();
+        setPublicSettings(data.settings || null);
+      } catch {}
+    })();
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -34,11 +44,11 @@ function Layout({ children }) {
     { name: 'Templates', href: '/admin/templates', icon: FileStack },
     { name: 'Service Providers', href: '/admin/users', icon: Users },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
-    { name: 'Profile', href: '/admin/profile', icon: UserCircle }
+    { name: 'Profile', href: '/profile', icon: User }
   ] : [
     { name: 'Dashboard', href: '/provider/dashboard', icon: LayoutDashboard },
     { name: 'My Contracts', href: '/provider/contracts', icon: FileText },
-    { name: 'Profile', href: '/provider/profile', icon: UserCircle }
+    { name: 'Profile', href: '/profile', icon: User }
   ];
 
   return (
@@ -63,9 +73,13 @@ function Layout({ children }) {
           {/* Logo */}
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center gap-3">
-              <Building2 className="text-primary-600" size={32} />
+              {publicSettings?.logo_url ? (
+                <img src={publicSettings.logo_url} alt="Logo" className="w-8 h-8 object-contain" />
+              ) : (
+                <Building2 className="text-primary-600" size={32} />
+              )}
               <div>
-                <h1 className="text-lg font-bold text-gray-900">AEMCO</h1>
+                <h1 className="text-lg font-bold text-gray-900">{publicSettings?.company_name || 'AEMCO'}</h1>
                 <p className="text-xs text-gray-500">Contract Builder</p>
               </div>
             </div>
@@ -100,25 +114,18 @@ function Layout({ children }) {
           {/* User info */}
           <div className="p-4 border-t border-gray-200">
             <div className="mb-3 px-2">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
+              <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+              <p className="text-xs text-gray-500">{user?.email}</p>
               <span className={`
                 inline-block mt-2 px-2 py-0.5 text-xs font-medium rounded-full
-                ${isAdmin ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}
+                ${isAdmin ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}
               `}>
                 {isAdmin ? 'Administrator' : 'Service Provider'}
               </span>
             </div>
-            
-            {/* Theme Toggle */}
-            <div className="mb-3 flex items-center justify-between px-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Theme</span>
-              <ThemeToggle />
-            </div>
-            
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <LogOut size={18} />
               <span>Logout</span>

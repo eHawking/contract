@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Save, Loader2, ArrowLeft } from 'lucide-react';
 import Layout from '../../components/Layout';
-import { templatesAPI } from '../../lib/api';
+import { templatesAPI, aiAPI } from '../../lib/api';
 import { toast } from 'sonner';
 
 function AdminTemplateForm() {
@@ -12,6 +12,13 @@ function AdminTemplateForm() {
 
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(isEdit);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [ai, setAi] = useState({
+    description: '',
+    placeholders: '',
+    tone: 'professional',
+    language: 'English'
+  });
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -39,6 +46,30 @@ function AdminTemplateForm() {
       navigate('/admin/templates');
     } finally {
       setLoadingData(false);
+    }
+  };
+
+  const handleGenerateAI = async () => {
+    if (!ai.description || ai.description.length < 10) {
+      return toast.error('Enter a short description (min 10 chars)');
+    }
+    setAiLoading(true);
+    try {
+      const placeholders = ai.placeholders
+        ? ai.placeholders.split(',').map(s => s.trim()).filter(Boolean)
+        : [];
+      const { data } = await aiAPI.generateTemplate({
+        description: ai.description,
+        placeholders,
+        tone: ai.tone,
+        language: ai.language
+      });
+      setFormData(fd => ({ ...fd, content: data.content || fd.content }));
+      toast.success('Template content generated');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'AI generation failed');
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -146,6 +177,45 @@ function AdminTemplateForm() {
 
           <div className="card">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Template Content *</h2>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                AI Generation
+              </label>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    className="textarea"
+                    rows="3"
+                    value={ai.description}
+                    onChange={(e) => setAi({ ...ai, description: e.target.value })}
+                    placeholder="Enter a short description..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Placeholders (comma separated)
+                  </label>
+                  <input
+                    type="text"
+                    className="input"
+                    value={ai.placeholders}
+                    onChange={(e) => setAi({ ...ai, placeholders: e.target.value })}
+                    placeholder="e.g., provider_name, amount, start_date"
+                  />
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={aiLoading}
+                className="btn btn-secondary"
+                onClick={handleGenerateAI}
+              >
+                {aiLoading ? <Loader2 size={20} className="animate-spin" /> : 'Generate'}
+              </button>
+            </div>
             <textarea
               required
               className="textarea font-mono text-sm"

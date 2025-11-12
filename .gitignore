@@ -1,39 +1,12 @@
-# Dependencies
 node_modules/
-package-lock.json
-
-# Environment variables
 .env
-.env.local
-.env.production
-
-# Logs
 *.log
-logs/
-npm-debug.log*
-
-# Build outputs
+.DS_Store
 dist/
 build/
-client/dist/
-
-# Uploads (user-generated content)
 uploads/
 *.pdf
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDE
 .vscode/
-.idea/
 *.swp
 *.swo
-
-# Cache
 .cache/
-.temp/
-
-# PM2
-.pm2/

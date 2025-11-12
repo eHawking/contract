@@ -1,231 +1,88 @@
 const express = require('express');
-const router = express.Router();
-const { pool } = require('../database');
-const { authenticateToken } = require('../middleware/auth');
-const { auditLog } = require('../middleware/audit');
-const bcrypt = require('bcryptjs');
+const { body } = require('express-validator');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs').promises;
+const fs = require('fs');
+const { pool } = require('../database');
+const { authenticateToken } = require('../middleware/auth');
+const { validate } = require('../middleware/validator');
+const { logAudit } = require('../middleware/audit');
 
-// Configure multer for profile photos
-const storage = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    const uploadDir = path.join(__dirname, '../../uploads/profiles');
-    try {
-      await fs.mkdir(uploadDir, { recursive: true });
-      cb(null, uploadDir);
-    } catch (err) {
-      cb(err);
-    }
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'profile-' + uniqueSuffix + path.extname(file.originalname));
-  }
+const router = express.Router();
+router.use(authenticateToken);
+
+router.get('/', async (req, res) => {
+  res.json({ user: req.user });
 });
 
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
-    
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(new Error('Only JPG, JPEG, and PNG images are allowed!'));
-    }
-  }
-});
-
-// Get current user profile
-router.get('/', authenticateToken, async (req, res) => {
+router.put('/', [
+  body('name').optional().isString().trim(),
+  body('phone').optional().isString(),
+  body('address').optional().isString(),
+  body('company_name').optional().isString().trim(),
+  body('email').optional().isEmail().normalizeEmail(),
+  validate
+], async (req, res) => {
+  const conn = await pool.getConnection();
   try {
-    const [users] = await pool.query(
-      `SELECT id, email, name, role, company_name, company_address, 
-              phone, address, profile_photo, status, created_at
-       FROM users WHERE id = ?`,
-      [req.user.id]
-    );
-    
-    if (users.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
+    const fields = ['name','phone','address','company_name','email'];
+    const updates = [];
+    const params = [];
+    for (const f of fields) {
+      if (req.body[f] !== undefined) { updates.push(`${f} = ?`); params.push(req.body[f]); }
     }
-    
-    res.json(users[0]);
-  } catch (err) {
-    console.error('Error fetching profile:', err);
-    res.status(500).json({ error: 'Failed to fetch profile' });
-  }
-});
+    if (updates.length === 0) return res.status(400).json({ error: 'No fields to update' });
+    params.push(req.user.id);
 
-// Update profile
-router.put('/', authenticateToken, auditLog('update_profile'), async (req, res) => {
-  try {
-    const { name, email, company_name, company_address, phone, address } = req.body;
-    
-    // Check if email is already used by another user
-    if (email !== req.user.email) {
-      const [existing] = await pool.query(
-        'SELECT id FROM users WHERE email = ? AND id != ?',
-        [email, req.user.id]
-      );
-      
-      if (existing.length > 0) {
-        return res.status(400).json({ error: 'Email already in use' });
-      }
+    // If updating email, ensure uniqueness
+    if (req.body.email) {
+      const [existing] = await conn.query('SELECT id FROM users WHERE email = ? AND id <> ?', [req.body.email, req.user.id]);
+      if (existing) return res.status(400).json({ error: 'Email already in use' });
     }
-    
-    await pool.query(
-      `UPDATE users SET 
-        name = ?, 
-        email = ?, 
-        company_name = ?, 
-        company_address = ?,
-        phone = ?,
-        address = ?
-       WHERE id = ?`,
-      [name, email, company_name, company_address, phone, address, req.user.id]
-    );
-    
-    // Fetch updated profile
-    const [users] = await pool.query(
-      `SELECT id, email, name, role, company_name, company_address,
-              phone, address, profile_photo, status
-       FROM users WHERE id = ?`,
-      [req.user.id]
-    );
-    
-    res.json({ 
-      message: 'Profile updated successfully',
-      user: users[0]
-    });
+
+    await conn.query(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, params);
+    await logAudit(req.user.id, 'UPDATE_PROFILE', 'user', req.user.id, {}, req);
+    const [updated] = await conn.query('SELECT id, email, name, role, company_name, phone, status, avatar_url FROM users WHERE id = ?', [req.user.id]);
+    res.json({ message: 'Profile updated', user: updated });
   } catch (err) {
-    console.error('Error updating profile:', err);
     res.status(500).json({ error: 'Failed to update profile' });
+  } finally {
+    conn.release();
   }
 });
 
-// Change password
-router.post('/change-password', authenticateToken, auditLog('change_password'), async (req, res) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
-    
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({ error: 'Current and new passwords are required' });
-    }
-    
-    if (newPassword.length < 8) {
-      return res.status(400).json({ error: 'Password must be at least 8 characters long' });
-    }
-    
-    // Verify current password
-    const [users] = await pool.query(
-      'SELECT password FROM users WHERE id = ?',
-      [req.user.id]
-    );
-    
-    if (users.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    const isValid = await bcrypt.compare(currentPassword, users[0].password);
-    if (!isValid) {
-      return res.status(401).json({ error: 'Current password is incorrect' });
-    }
-    
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    
-    // Update password
-    await pool.query(
-      'UPDATE users SET password = ? WHERE id = ?',
-      [hashedPassword, req.user.id]
-    );
-    
-    res.json({ message: 'Password changed successfully' });
-  } catch (err) {
-    console.error('Error changing password:', err);
-    res.status(500).json({ error: 'Failed to change password' });
+// Avatar upload
+const avatarDir = path.join(__dirname, '..', '..', 'uploads', 'avatars');
+fs.mkdirSync(avatarDir, { recursive: true });
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, avatarDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname || '').toLowerCase();
+    cb(null, `avatar_${req.user.id}_${Date.now()}${ext}`);
+  }
+});
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = ['.png','.jpg','.jpeg','.webp'];
+    const ext = path.extname(file.originalname || '').toLowerCase();
+    if (!allowed.includes(ext)) return cb(new Error('Invalid file type'));
+    cb(null, true);
   }
 });
 
-// Upload profile photo
-router.post('/upload-photo', authenticateToken, upload.single('photo'), auditLog('upload_profile_photo'), async (req, res) => {
+router.post('/avatar', upload.single('avatar'), async (req, res) => {
+  const conn = await pool.getConnection();
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
-    }
-    
-    const filePath = '/uploads/profiles/' + req.file.filename;
-    
-    // Save to uploads table
-    await pool.query(
-      `INSERT INTO uploads (file_name, file_path, file_type, file_size, uploaded_by, upload_type)
-       VALUES (?, ?, ?, ?, ?, 'profile_photo')`,
-      [req.file.filename, filePath, req.file.mimetype, req.file.size, req.user.id]
-    );
-    
-    // Delete old profile photo if exists
-    const [oldPhoto] = await pool.query(
-      'SELECT profile_photo FROM users WHERE id = ?',
-      [req.user.id]
-    );
-    
-    if (oldPhoto[0]?.profile_photo) {
-      const oldPath = path.join(__dirname, '../..', oldPhoto[0].profile_photo);
-      try {
-        await fs.unlink(oldPath);
-      } catch (err) {
-        // Ignore error if file doesn't exist
-      }
-    }
-    
-    // Update user profile photo
-    await pool.query(
-      'UPDATE users SET profile_photo = ? WHERE id = ?',
-      [filePath, req.user.id]
-    );
-    
-    res.json({ 
-      message: 'Profile photo uploaded successfully',
-      filePath: filePath
-    });
+    const rel = `/uploads/avatars/${path.basename(req.file.path)}`;
+    await conn.query('UPDATE users SET avatar_url = ? WHERE id = ?', [rel, req.user.id]);
+    await logAudit(req.user.id, 'UPLOAD_AVATAR', 'user', req.user.id, { avatar_url: rel }, req);
+    res.json({ message: 'Avatar updated', avatar_url: rel });
   } catch (err) {
-    console.error('Error uploading profile photo:', err);
-    res.status(500).json({ error: 'Failed to upload profile photo' });
-  }
-});
-
-// Delete profile photo
-router.delete('/photo', authenticateToken, auditLog('delete_profile_photo'), async (req, res) => {
-  try {
-    const [user] = await pool.query(
-      'SELECT profile_photo FROM users WHERE id = ?',
-      [req.user.id]
-    );
-    
-    if (user[0]?.profile_photo) {
-      const filePath = path.join(__dirname, '../..', user[0].profile_photo);
-      try {
-        await fs.unlink(filePath);
-      } catch (err) {
-        // Ignore error if file doesn't exist
-      }
-      
-      await pool.query(
-        'UPDATE users SET profile_photo = NULL WHERE id = ?',
-        [req.user.id]
-      );
-    }
-    
-    res.json({ message: 'Profile photo deleted successfully' });
-  } catch (err) {
-    console.error('Error deleting profile photo:', err);
-    res.status(500).json({ error: 'Failed to delete profile photo' });
+    res.status(500).json({ error: 'Failed to upload avatar' });
+  } finally {
+    conn.release();
   }
 });
 

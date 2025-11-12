@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -15,6 +16,7 @@ const providerRoutes = require('./routes/provider');
 const userRoutes = require('./routes/users');
 const settingsRoutes = require('./routes/settings');
 const profileRoutes = require('./routes/profile');
+const aiRoutes = require('./routes/ai');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -47,8 +49,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve uploads directory
+// Serve uploads (logos, avatars, etc.)
 const uploadsPath = path.join(__dirname, '..', 'uploads');
+try { fs.mkdirSync(uploadsPath, { recursive: true }); } catch (e) {}
 app.use('/uploads', express.static(uploadsPath));
 
 // Serve static files (frontend build) - MUST be before API routes
@@ -85,6 +88,7 @@ app.use('/api/provider', providerRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Serve index.html for all other routes (SPA fallback)
 if (process.env.NODE_ENV === 'production') {

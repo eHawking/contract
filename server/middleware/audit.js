@@ -24,33 +24,4 @@ async function logAudit(userId, action, entityType, entityId, details, req) {
   }
 }
 
-// Middleware to log actions
-function auditLog(action) {
-  return async (req, res, next) => {
-    // Store original send function
-    const originalSend = res.send;
-    
-    // Override send to log after successful response
-    res.send = function(data) {
-      // Log the action if response is successful
-      if (res.statusCode >= 200 && res.statusCode < 300) {
-        const entityId = req.params.id || req.body.id || null;
-        logAudit(
-          req.user?.id,
-          action,
-          req.baseUrl.split('/').pop(),
-          entityId,
-          { method: req.method, path: req.path },
-          req
-        );
-      }
-      
-      // Call original send
-      originalSend.call(this, data);
-    };
-    
-    next();
-  };
-}
-
-module.exports = { logAudit, auditLog };
+module.exports = { logAudit };

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Save, Send, Loader2, ArrowLeft } from 'lucide-react';
 import Layout from '../../components/Layout';
-import { contractsAPI, templatesAPI, usersAPI } from '../../lib/api';
+import { contractsAPI, templatesAPI, usersAPI, aiAPI } from '../../lib/api';
 import { toast } from 'sonner';
 
 function AdminContractForm() {
@@ -14,6 +14,8 @@ function AdminContractForm() {
   const [loadingData, setLoadingData] = useState(isEdit);
   const [templates, setTemplates] = useState([]);
   const [providers, setProviders] = useState([]);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiReq, setAiReq] = useState({ requirements: '' });
   const [formData, setFormData] = useState({
     provider_id: '',
     template_id: '',
@@ -41,6 +43,29 @@ function AdminContractForm() {
       setProviders(providersRes.data.users);
     } catch (err) {
       toast.error('Failed to load options');
+    }
+  };
+
+  const handleAIContract = async () => {
+    setAiLoading(true);
+    try {
+      const variables = {
+        provider_name: providers.find(p => p.id === Number(formData.provider_id))?.name,
+        provider_company: providers.find(p => p.id === Number(formData.provider_id))?.company_name,
+        amount: formData.amount,
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+        currency: formData.currency,
+        title: formData.title
+      };
+      const templateSummary = templates.find(t => t.id === Number(formData.template_id))?.description || '';
+      const { data } = await aiAPI.generateContract({ templateSummary, variables, requirements: aiReq.requirements });
+      setFormData(fd => ({ ...fd, content: data.content || fd.content }));
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(err);
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -236,6 +261,23 @@ function AdminContractForm() {
 
           <div className="card">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Contract Content *</h2>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">AI Assist (optional)</label>
+              <div className="grid md:grid-cols-3 gap-4 items-end">
+                <div className="md:col-span-2">
+                  <input
+                    type="text"
+                    className="input"
+                    placeholder="Extra requirements or details to include..."
+                    value={aiReq.requirements}
+                    onChange={(e)=>setAiReq({ requirements: e.target.value })}
+                  />
+                </div>
+                <button type="button" className="btn btn-secondary" disabled={aiLoading} onClick={handleAIContract}>
+                  {aiLoading ? <Loader2 size={20} className="animate-spin" /> : 'Generate with AI'}
+                </button>
+              </div>
+            </div>
             <textarea
               required
               className="textarea font-mono text-sm"

@@ -82,32 +82,31 @@ export const providerAPI = {
   downloadPDF: (id) => api.get(`/provider/contracts/${id}/pdf`, { responseType: 'blob' })
 };
 
-// Settings API
+// Settings API (admin)
 export const settingsAPI = {
-  getAll: () => api.get('/settings'),
+  get: () => api.get('/settings'),
   getPublic: () => api.get('/settings/public'),
   update: (data) => api.put('/settings', data),
   uploadLogo: (file) => {
-    const formData = new FormData();
-    formData.append('logo', file);
-    return api.post('/settings/upload-logo', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-  },
-  generateContent: (prompt, type) => api.post('/settings/ai/generate-content', { prompt, type })
+    const form = new FormData();
+    form.append('logo', file);
+    return api.post('/settings/logo', form, { headers: { 'Content-Type': 'multipart/form-data' } });
+  }
 };
 
-// Profile API
+// Profile API (all users)
 export const profileAPI = {
   get: () => api.get('/profile'),
   update: (data) => api.put('/profile', data),
-  changePassword: (data) => api.post('/profile/change-password', data),
-  uploadPhoto: (file) => {
-    const formData = new FormData();
-    formData.append('photo', file);
-    return api.post('/profile/upload-photo', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-  },
-  deletePhoto: () => api.delete('/profile/photo')
+  uploadAvatar: (file) => {
+    const form = new FormData();
+    form.append('avatar', file);
+    return api.post('/profile/avatar', form, { headers: { 'Content-Type': 'multipart/form-data' } });
+  }
+};
+
+// AI API (admin)
+export const aiAPI = {
+  generateTemplate: (payload) => api.post('/ai/generate/template', payload),
+  generateContract: (payload) => api.post('/ai/generate/contract', payload)
 };

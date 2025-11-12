@@ -1,11 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import useAuthStore from './store/useAuthStore';
-import useThemeStore from './store/useThemeStore';
-
-// Components
-import WelcomeModal from './components/WelcomeModal';
 
 // Auth pages
 import Login from './pages/Login';
@@ -25,8 +21,6 @@ import AdminSettings from './pages/admin/Settings';
 import ProviderDashboard from './pages/provider/Dashboard';
 import ProviderContracts from './pages/provider/Contracts';
 import ProviderContractView from './pages/provider/ContractView';
-
-// Shared pages
 import Profile from './pages/Profile';
 
 // Protected route component
@@ -46,17 +40,10 @@ function ProtectedRoute({ children, requiredRole }) {
 
 function App() {
   const { isAuthenticated, user } = useAuthStore();
-
-  // Initialize theme on app start
-  useEffect(() => {
-    const { theme } = useThemeStore.getState();
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-  }, []);
-
+  
   return (
     <Router>
       <Toaster position="top-right" richColors />
-      <WelcomeModal />
       <Routes>
         {/* Public routes */}
         <Route 
@@ -165,14 +152,6 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        <Route 
-          path="/admin/profile" 
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <Profile />
-            </ProtectedRoute>
-          } 
-        />
         
         {/* Provider routes */}
         <Route 
@@ -199,10 +178,12 @@ function App() {
             </ProtectedRoute>
           } 
         />
+
+        {/* Shared profile route */}
         <Route 
-          path="/provider/profile" 
+          path="/profile" 
           element={
-            <ProtectedRoute requiredRole="provider">
+            <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
           } 
