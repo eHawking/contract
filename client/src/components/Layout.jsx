@@ -62,13 +62,16 @@ function Layout({ children }) {
       `}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center gap-3">
-              <Building2 className="text-primary-600" size={32} />
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">AEMCO</h1>
-                <p className="text-xs text-gray-500">Contract Builder</p>
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <Building2 className="text-primary-600 dark:text-primary-400" size={32} />
+                <div>
+                  <h1 className="text-lg font-bold text-gray-900 dark:text-white">AEMCO</h1>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Contract Builder</p>
+                </div>
               </div>
+              <ThemeToggle />
             </div>
           </div>
 
@@ -86,8 +89,8 @@ function Layout({ children }) {
                   className={`
                     flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
                     ${isActive 
-                      ? 'bg-primary-50 text-primary-700 font-medium' 
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 font-medium' 
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                     }
                   `}
                 >
@@ -99,20 +102,20 @@ function Layout({ children }) {
           </nav>
 
           {/* User info */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
             <div className="mb-3 px-2">
-              <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-              <p className="text-xs text-gray-500">{user?.email}</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
               <span className={`
                 inline-block mt-2 px-2 py-0.5 text-xs font-medium rounded-full
-                ${isAdmin ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}
+                ${isAdmin ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'}
               `}>
                 {isAdmin ? 'Administrator' : 'Service Provider'}
               </span>
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
               <LogOut size={18} />
               <span>Logout</span>
@@ -135,6 +138,9 @@ function Layout({ children }) {
           onClick={() => setSidebarOpen(false)}
         />
       )}
+      
+      {/* Welcome Modal */}
+      <WelcomeModal />
     </div>
   );
 }

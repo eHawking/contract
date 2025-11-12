@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Building2, Mail, Lock, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import useAuthStore from '../store/useAuthStore';
+import ThemeToggle from '../components/ThemeToggle';
 
 function Login() {
   const navigate = useNavigate();
@@ -35,36 +36,41 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-900 dark:to-gray-800 p-4 transition-colors duration-200">
+      {/* Theme Toggle */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+      
+      <div className="w-full max-w-md animate-slide-up">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
           {/* Logo */}
           <div className="flex justify-center mb-8">
             <div className="flex items-center gap-3">
-              <Building2 className="text-primary-600" size={48} />
+              <Building2 className="text-primary-600 dark:text-primary-400" size={48} />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">AEMCO</h1>
-                <p className="text-sm text-gray-500">Contract Builder</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">AEMCO</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Contract Builder</p>
               </div>
             </div>
           </div>
 
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-            <p className="text-gray-600">Sign in to your account</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Welcome Back</h2>
+            <p className="text-gray-600 dark:text-gray-400">Sign in to your account</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
                 <input
                   type="email"
                   required
-                  className="input pl-10"
+                  className="w-full px-4 py-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -73,15 +79,15 @@ function Login() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
                 <input
                   type="password"
                   required
-                  className="input pl-10"
+                  className="w-full px-4 py-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -106,17 +112,17 @@ function Login() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               Don't have an account?{' '}
-              <Link to="/register" className="text-primary-600 hover:text-primary-700 font-medium">
+              <Link to="/register" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
                 Register as Service Provider
               </Link>
             </p>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-gray-200 text-center text-xs text-gray-500">
-            <p>AHMED ESSA CONSTRUCTION & TRADING (AEMCO)</p>
-            <p>6619, King Fahd Road, Dammam, 32243, Saudi Arabia</p>
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-500 dark:text-gray-400">
+            <p className="font-medium">AHMED ESSA CONSTRUCTION & TRADING (AEMCO)</p>
+            <p className="mt-1">6619, King Fahd Road, Dammam, 32243, Saudi Arabia</p>
           </div>
         </div>
       </div>
