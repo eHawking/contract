@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  FileText,
-  Users,
-  FileStack,
+import { 
+  LayoutDashboard, 
+  FileText, 
+  Users, 
+  FileStack, 
   LogOut,
   Building2,
   Menu,
@@ -14,23 +14,12 @@ import {
 } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore';
 import ThemeToggle from './ThemeToggle';
-import WelcomeModal from './WelcomeModal';
 
 function Layout({ children }) {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
-  const [showWelcome, setShowWelcome] = React.useState(false);
-
-  React.useEffect(() => {
-    // Show welcome modal on first login
-    const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
-    if (!hasSeenWelcome && user) {
-      setShowWelcome(true);
-      localStorage.setItem('hasSeenWelcome', 'true');
-    }
-  }, [user]);
 
   const handleLogout = async () => {
     await logout();
@@ -111,21 +100,25 @@ function Layout({ children }) {
           {/* User info */}
           <div className="p-4 border-t border-gray-200">
             <div className="mb-3 px-2">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                <ThemeToggle />
-              </div>
-              <p className="text-xs text-gray-500">{user?.email}</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
               <span className={`
                 inline-block mt-2 px-2 py-0.5 text-xs font-medium rounded-full
-                ${isAdmin ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}
+                ${isAdmin ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}
               `}>
                 {isAdmin ? 'Administrator' : 'Service Provider'}
               </span>
             </div>
+            
+            {/* Theme Toggle */}
+            <div className="mb-3 flex items-center justify-between px-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Theme</span>
+              <ThemeToggle />
+            </div>
+            
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
               <LogOut size={18} />
               <span>Logout</span>
@@ -146,14 +139,6 @@ function Layout({ children }) {
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Welcome Modal */}
-      {showWelcome && (
-        <WelcomeModal
-          user={user}
-          onClose={() => setShowWelcome(false)}
         />
       )}
     </div>

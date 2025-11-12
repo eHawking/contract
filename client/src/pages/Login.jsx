@@ -21,6 +21,9 @@ function Login() {
       const data = await login(formData);
       toast.success('Login successful!');
       
+      // Set flag to show welcome modal
+      sessionStorage.setItem('justLoggedIn', 'true');
+      
       // Redirect based on role
       if (data.user.role === 'admin') {
         navigate('/admin/dashboard');

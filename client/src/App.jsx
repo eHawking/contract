@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import useAuthStore from './store/useAuthStore';
+import useThemeStore from './store/useThemeStore';
 
-// Theme provider
-import ThemeProvider from './components/ThemeProvider';
+// Components
+import WelcomeModal from './components/WelcomeModal';
 
 // Auth pages
 import Login from './pages/Login';
@@ -45,12 +46,18 @@ function ProtectedRoute({ children, requiredRole }) {
 
 function App() {
   const { isAuthenticated, user } = useAuthStore();
-  
+
+  // Initialize theme on app start
+  useEffect(() => {
+    const { theme } = useThemeStore.getState();
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, []);
+
   return (
-    <ThemeProvider>
-      <Router>
-        <Toaster position="top-right" richColors />
-        <Routes>
+    <Router>
+      <Toaster position="top-right" richColors />
+      <WelcomeModal />
+      <Routes>
         {/* Public routes */}
         <Route 
           path="/login" 
@@ -204,8 +211,7 @@ function App() {
         {/* 404 */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      </Router>
-    </ThemeProvider>
+    </Router>
   );
 }
 

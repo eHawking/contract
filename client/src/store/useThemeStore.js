@@ -3,16 +3,22 @@ import { persist } from 'zustand/middleware';
 
 const useThemeStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       theme: 'light',
-      toggleTheme: () =>
-        set((state) => ({
-          theme: state.theme === 'light' ? 'dark' : 'light'
-        })),
-      setTheme: (theme) => set({ theme })
+      setTheme: (theme) => {
+        set({ theme });
+        // Apply theme to document
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+      },
+      toggleTheme: () => {
+        const currentTheme = get().theme;
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        get().setTheme(newTheme);
+      }
     }),
     {
-      name: 'theme-storage'
+      name: 'theme-storage',
+      getStorage: () => localStorage,
     }
   )
 );
