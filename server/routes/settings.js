@@ -10,6 +10,20 @@ const { logAudit } = require('../middleware/audit');
 
 const router = express.Router();
 
+// Public settings must be accessible without auth
+router.get('/public', async (req, res) => {
+  const conn = await pool.getConnection();
+  try {
+    const [settings] = await conn.query('SELECT company_name, company_address, company_phone, company_email, company_website, logo_url FROM app_settings WHERE id = 1');
+    res.json({ settings });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load public settings' });
+  } finally {
+    conn.release();
+  }
+});
+
+// All other settings require admin auth
 router.use(authenticateToken, requireAdmin);
 
 router.get('/', async (req, res) => {
@@ -19,18 +33,6 @@ router.get('/', async (req, res) => {
     res.json({ settings });
   } catch (err) {
     res.status(500).json({ error: 'Failed to load settings' });
-  } finally {
-    conn.release();
-  }
-});
-
-router.get('/public', async (req, res) => {
-  const conn = await pool.getConnection();
-  try {
-    const [settings] = await conn.query('SELECT company_name, company_address, company_phone, company_email, company_website, logo_url FROM app_settings WHERE id = 1');
-    res.json({ settings });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to load public settings' });
   } finally {
     conn.release();
   }

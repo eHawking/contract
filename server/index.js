@@ -6,7 +6,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-const { testConnection } = require('./database');
+const { pool, testConnection } = require('./database');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -119,6 +119,46 @@ async function startServer() {
     const dbConnected = await testConnection();
     if (!dbConnected) {
       console.error('⚠️  Database connection failed. Server starting anyway...');
+    }
+
+    // Ensure app_settings table and default row exist (id=1)
+    try {
+      const conn = await pool.getConnection();
+      try {
+        await conn.query(`
+          CREATE TABLE IF NOT EXISTS app_settings (
+            id TINYINT PRIMARY KEY DEFAULT 1,
+            company_name VARCHAR(255),
+            company_address TEXT,
+            company_phone VARCHAR(50),
+            company_email VARCHAR(255),
+            company_website VARCHAR(255),
+            logo_url VARCHAR(255),
+            email_smtp_host VARCHAR(255),
+            email_smtp_port INT,
+            email_smtp_user VARCHAR(255),
+            email_smtp_password VARCHAR(255),
+            email_smtp_secure TINYINT(1) DEFAULT 1,
+            gemini_api_key VARCHAR(255),
+            gemini_model VARCHAR(100),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+        await conn.query(`
+          INSERT IGNORE INTO app_settings (id, company_name, company_address, company_phone, company_email, company_website, gemini_model)
+          VALUES (1, NULL, NULL, NULL, NULL, NULL, 'gemini-1.5-flash')
+        `);
+        // Ensure users.avatar_url column exists
+        await conn.query(`
+          ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(255) NULL
+        `);
+        console.log('✅ app_settings table ensured and default row present');
+      } finally {
+        conn.release();
+      }
+    } catch (e) {
+      console.error('Settings bootstrap error:', e.message);
     }
 
     app.listen(PORT, () => {
