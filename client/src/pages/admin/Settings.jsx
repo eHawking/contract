@@ -86,7 +86,7 @@ export default function Settings() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
+        <h1 className="text-3xl font-bold">Settings</h1>
         <button
           onClick={handleSave}
           disabled={saving}
@@ -98,7 +98,7 @@ export default function Settings() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 dark:border-gray-700">
+      <div className="border-b border-gray-200">
         <nav className="-mb-px flex space-x-8">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -107,10 +107,10 @@ export default function Settings() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`
-                  flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                  flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm
                   ${activeTab === tab.id
-                    ? 'border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                    ? 'border-primary-600 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }
                 `}
               >
@@ -125,11 +125,11 @@ export default function Settings() {
       {/* Company Details Tab */}
       {activeTab === 'company' && (
         <div className="card space-y-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Company Information</h2>
+          <h2 className="text-xl font-semibold">Company Information</h2>
 
           {/* Logo Upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Company Logo
             </label>
             <div className="flex items-center gap-4">
@@ -137,7 +137,7 @@ export default function Settings() {
                 <img
                   src={logoPreview}
                   alt="Company logo"
-                  className="w-32 h-32 object-contain border border-gray-200 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700"
+                  className="w-32 h-32 object-contain border border-gray-200 rounded-lg p-2"
                 />
               )}
               <div>
@@ -151,7 +151,7 @@ export default function Settings() {
                     className="hidden"
                   />
                 </label>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                <p className="text-sm text-gray-500 mt-2">
                   PNG, JPG, SVG up to 5MB
                 </p>
               </div>
@@ -160,7 +160,7 @@ export default function Settings() {
 
           {/* Company Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Company Name
             </label>
             <input
@@ -174,7 +174,7 @@ export default function Settings() {
 
           {/* Address */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Address
             </label>
             <textarea
@@ -188,7 +188,7 @@ export default function Settings() {
 
           {/* Phone */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Phone
             </label>
             <input
@@ -202,7 +202,7 @@ export default function Settings() {
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Email
             </label>
             <input
@@ -216,7 +216,7 @@ export default function Settings() {
 
           {/* Website */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Website
             </label>
             <input
@@ -234,8 +234,8 @@ export default function Settings() {
       {activeTab === 'email' && (
         <div className="card space-y-6">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Email Configuration</h2>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+            <h2 className="text-xl font-semibold">Email Configuration</h2>
+            <p className="text-gray-600 text-sm mt-1">
               Configure SMTP settings for sending email notifications
             </p>
           </div>
@@ -243,7 +243,7 @@ export default function Settings() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* SMTP Host */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 SMTP Host
               </label>
               <input
@@ -257,7 +257,7 @@ export default function Settings() {
 
             {/* SMTP Port */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 SMTP Port
               </label>
               <input
@@ -271,7 +271,7 @@ export default function Settings() {
 
             {/* SMTP User */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 SMTP Username
               </label>
               <input
@@ -285,7 +285,7 @@ export default function Settings() {
 
             {/* SMTP Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 SMTP Password
               </label>
               <input
@@ -299,7 +299,7 @@ export default function Settings() {
 
             {/* From Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 From Name
               </label>
               <input
@@ -313,7 +313,7 @@ export default function Settings() {
 
             {/* From Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 From Email
               </label>
               <input
@@ -332,20 +332,20 @@ export default function Settings() {
       {activeTab === 'ai' && (
         <div className="card space-y-6">
           <div>
-            <h2 className="text-xl font-semibold flex items-center gap-2 text-gray-900 dark:text-white">
-              <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-purple-600" />
               AI Content Generation
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+            <p className="text-gray-600 text-sm mt-1">
               Configure Google Gemini AI for automatic contract and template content generation
             </p>
           </div>
 
           {/* Enable AI */}
-          <div className="flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
             <div>
-              <h3 className="font-medium text-gray-900 dark:text-white">Enable AI Features</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <h3 className="font-medium text-gray-900">Enable AI Features</h3>
+              <p className="text-sm text-gray-600">
                 Use AI to generate contract content automatically
               </p>
             </div>
@@ -356,7 +356,7 @@ export default function Settings() {
                 onChange={(e) => handleChange('ai_enabled', e.target.checked ? 'true' : 'false')}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600 dark:peer-checked:bg-purple-500"></div>
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
             </label>
           </div>
 
@@ -379,7 +379,7 @@ export default function Settings() {
                 href="https://makersuite.google.com/app/apikey"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-purple-600 dark:text-purple-400 hover:underline"
+                className="text-purple-600 hover:underline"
               >
                 Google AI Studio
               </a>
@@ -388,7 +388,7 @@ export default function Settings() {
 
           {/* Model Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Gemini Model
             </label>
             <select
@@ -406,9 +406,9 @@ export default function Settings() {
           </div>
 
           {/* Info Box */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-            <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-2">How it works:</h4>
-            <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1 list-disc list-inside">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="font-medium text-blue-900 mb-2">How it works:</h4>
+            <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
               <li>AI will help generate professional contract content</li>
               <li>Automatically fill templates with relevant clauses</li>
               <li>Suggest improvements to contract language</li>

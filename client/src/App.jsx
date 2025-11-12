@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'sonner';
 import useAuthStore from './store/useAuthStore';
 
+// Theme provider
+import ThemeProvider from './components/ThemeProvider';
+
 // Auth pages
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -44,9 +47,10 @@ function App() {
   const { isAuthenticated, user } = useAuthStore();
   
   return (
-    <Router>
-      <Toaster position="top-right" richColors />
-      <Routes>
+    <ThemeProvider>
+      <Router>
+        <Toaster position="top-right" richColors />
+        <Routes>
         {/* Public routes */}
         <Route 
           path="/login" 
@@ -200,7 +204,8 @@ function App() {
         {/* 404 */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </Router>
+      </Router>
+    </ThemeProvider>
   );
 }
 

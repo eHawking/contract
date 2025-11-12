@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Users, 
-  FileStack, 
+import {
+  LayoutDashboard,
+  FileText,
+  Users,
+  FileStack,
   LogOut,
   Building2,
   Menu,
@@ -21,6 +21,16 @@ function Layout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [showWelcome, setShowWelcome] = React.useState(false);
+
+  React.useEffect(() => {
+    // Show welcome modal on first login
+    const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+    if (!hasSeenWelcome && user) {
+      setShowWelcome(true);
+      localStorage.setItem('hasSeenWelcome', 'true');
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     await logout();
@@ -43,12 +53,12 @@ function Layout({ children }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div className="min-h-screen bg-gray-50">
       {/* Mobile menu button */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700"
+          className="p-2 rounded-lg bg-white shadow-lg border border-gray-200"
         >
           {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -56,22 +66,19 @@ function Layout({ children }) {
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 z-40 h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700
+        fixed top-0 left-0 z-40 h-screen w-64 bg-white border-r border-gray-200 
         transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <Building2 className="text-primary-600 dark:text-primary-400" size={32} />
-                <div>
-                  <h1 className="text-lg font-bold text-gray-900 dark:text-white">AEMCO</h1>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Contract Builder</p>
-                </div>
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <Building2 className="text-primary-600" size={32} />
+              <div>
+                <h1 className="text-lg font-bold text-gray-900">AEMCO</h1>
+                <p className="text-xs text-gray-500">Contract Builder</p>
               </div>
-              <ThemeToggle />
             </div>
           </div>
 
@@ -89,8 +96,8 @@ function Layout({ children }) {
                   className={`
                     flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
                     ${isActive 
-                      ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 font-medium' 
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'bg-primary-50 text-primary-700 font-medium' 
+                      : 'text-gray-700 hover:bg-gray-100'
                     }
                   `}
                 >
@@ -102,20 +109,23 @@ function Layout({ children }) {
           </nav>
 
           {/* User info */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="p-4 border-t border-gray-200">
             <div className="mb-3 px-2">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                <ThemeToggle />
+              </div>
+              <p className="text-xs text-gray-500">{user?.email}</p>
               <span className={`
                 inline-block mt-2 px-2 py-0.5 text-xs font-medium rounded-full
-                ${isAdmin ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'}
+                ${isAdmin ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}
               `}>
                 {isAdmin ? 'Administrator' : 'Service Provider'}
               </span>
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <LogOut size={18} />
               <span>Logout</span>
@@ -138,9 +148,14 @@ function Layout({ children }) {
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      
+
       {/* Welcome Modal */}
-      <WelcomeModal />
+      {showWelcome && (
+        <WelcomeModal
+          user={user}
+          onClose={() => setShowWelcome(false)}
+        />
+      )}
     </div>
   );
 }

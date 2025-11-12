@@ -1,144 +1,123 @@
-import { useState, useEffect } from 'react';
-import { X, Sparkles, TrendingUp, FileText, Users, Settings as SettingsIcon } from 'lucide-react';
-import useAuthStore from '../store/useAuthStore';
+import React, { useEffect, useState } from 'react';
+import { CheckCircle, X, User, Building2, FileText } from 'lucide-react';
 
-export default function WelcomeModal() {
-  const { user } = useAuthStore();
-  const [show, setShow] = useState(false);
-  
-  useEffect(() => {
-    // Check if user has seen welcome message in this session
-    const hasSeenWelcome = sessionStorage.getItem(`welcome_${user?.id}`);
-    if (!hasSeenWelcome) {
-      setShow(true);
-      sessionStorage.setItem(`welcome_${user?.id}`, 'true');
-    }
-  }, [user?.id]);
+const WelcomeModal = ({ user, onClose }) => {
+  const [visible, setVisible] = useState(true);
+  const [currentStep, setCurrentStep] = useState(0);
 
-  if (!show) return null;
-
-  const isAdmin = user?.role === 'admin';
-
-  const features = isAdmin ? [
+  const steps = [
     {
-      icon: FileText,
-      title: 'Contract Management',
-      description: 'Create, edit, and manage contracts efficiently'
+      icon: CheckCircle,
+      title: `Welcome back, ${user?.name}!`,
+      message: user?.role === 'admin'
+        ? "You're now logged in as an administrator. You have full access to manage contracts, users, and system settings."
+        : "You're now logged in as a service provider. You can view and manage your assigned contracts.",
+      color: "text-green-600"
     },
     {
-      icon: Users,
-      title: 'Service Providers',
-      description: 'Manage service provider accounts and permissions'
+      icon: user?.role === 'admin' ? Building2 : FileText,
+      title: user?.role === 'admin' ? "Admin Dashboard" : "Your Contracts",
+      message: user?.role === 'admin'
+        ? "Access your dashboard to view statistics, manage contracts, and configure system settings."
+        : "View all your assigned contracts, sign documents, and download completed agreements.",
+      color: "text-blue-600"
     },
     {
-      icon: SettingsIcon,
-      title: 'System Settings',
-      description: 'Configure company details, email, and AI features'
-    },
-    {
-      icon: TrendingUp,
-      title: 'Analytics',
-      description: 'Track contract status and performance metrics'
-    }
-  ] : [
-    {
-      icon: FileText,
-      title: 'View Contracts',
-      description: 'Access and review your assigned contracts'
-    },
-    {
-      icon: Sparkles,
-      title: 'Digital Signing',
-      description: 'Sign contracts digitally with ease'
-    },
-    {
-      icon: TrendingUp,
-      title: 'Track Progress',
-      description: 'Monitor your contract status in real-time'
+      icon: User,
+      title: "Profile & Settings",
+      message: "Update your profile information, change your password, and customize your experience with light/dark theme toggle.",
+      color: "text-purple-600"
     }
   ];
 
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleClose();
+    }
+  };
+
+  const handleClose = () => {
+    setVisible(false);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
+  useEffect(() => {
+    // Auto-close after 10 seconds
+    const timer = setTimeout(() => {
+      handleClose();
+    }, 10000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!visible) return null;
+
+  const currentStepData = steps[currentStep];
+  const Icon = currentStepData.icon;
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full mx-4 animate-slide-up">
-        {/* Header */}
-        <div className="relative p-8 bg-gradient-to-r from-primary-600 to-primary-700 rounded-t-2xl">
-          <button
-            onClick={() => setShow(false)}
-            className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5 text-white" />
-          </button>
-          
-          <div className="flex items-center gap-4 text-white">
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-              <Sparkles className="w-8 h-8" />
-            </div>
-            <div>
-              <h2 className="text-3xl font-bold">
-                Welcome Back, {user?.name?.split(' ')[0]}! 👋
-              </h2>
-              <p className="text-primary-100 mt-1">
-                {isAdmin ? 'Admin Dashboard' : 'Service Provider Portal'}
-              </p>
-            </div>
-          </div>
+    <div className="welcome-modal" onClick={handleClose}>
+      <div className="welcome-content animate-slide-up" onClick={(e) => e.stopPropagation()}>
+        <button
+          onClick={handleClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <X size={24} />
+        </button>
+
+        <div className={`welcome-icon ${currentStepData.color}`}>
+          <Icon size={32} />
         </div>
 
-        {/* Content */}
-        <div className="p-8">
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
-            {isAdmin 
-              ? 'Manage your contract operations efficiently with our comprehensive admin tools.'
-              : 'Access your contracts, sign documents, and manage your work seamlessly.'
-            }
-          </p>
+        <h2 className="welcome-title">{currentStepData.title}</h2>
 
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={index}
-                  className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                        {feature.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {feature.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        <p className="welcome-message">{currentStepData.message}</p>
 
-          {/* Company Info */}
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700/30 dark:to-gray-800/30 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
-            <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-              <strong className="text-gray-900 dark:text-white">AHMED ESSA CONSTRUCTION & TRADING (AEMCO)</strong>
-              <br />
-              6619, King Fahd Road, Dammam, 32243, Saudi Arabia
-            </p>
-          </div>
+        {/* Progress indicators */}
+        <div className="flex justify-center gap-2 mb-6">
+          {steps.map((_, index) => (
+            <div
+              key={index}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                index === currentStep ? 'bg-blue-600' : 'bg-gray-300'
+              }`}
+            />
+          ))}
+        </div>
 
-          {/* Action Button */}
+        {/* Action buttons */}
+        <div className="flex gap-3 justify-center">
+          {currentStep > 0 && (
+            <button
+              onClick={() => setCurrentStep(currentStep - 1)}
+              className="btn btn-ghost"
+            >
+              Previous
+            </button>
+          )}
+
           <button
-            onClick={() => setShow(false)}
-            className="w-full mt-6 btn btn-primary py-3 text-lg"
+            onClick={handleNext}
+            className="btn btn-primary"
           >
-            Get Started
+            {currentStep === steps.length - 1 ? 'Get Started' : 'Next'}
           </button>
         </div>
+
+        {/* Skip option */}
+        <button
+          onClick={handleClose}
+          className="mt-4 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+        >
+          Skip welcome tour
+        </button>
       </div>
     </div>
   );
-}
+};
+
+export default WelcomeModal;

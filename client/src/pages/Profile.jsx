@@ -152,19 +152,19 @@ export default function Profile() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Profile Settings</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your account information</p>
+        <h1 className="text-3xl font-bold">Profile Settings</h1>
+        <p className="text-gray-600 mt-1">Manage your account information</p>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 dark:border-gray-700">
+      <div className="border-b border-gray-200">
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab('profile')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 transition-colors ${
+            className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
               activeTab === 'profile'
-                ? 'border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-400'
-                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                ? 'border-primary-600 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
             <User className="w-5 h-5" />
@@ -172,10 +172,10 @@ export default function Profile() {
           </button>
           <button
             onClick={() => setActiveTab('password')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 transition-colors ${
+            className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
               activeTab === 'password'
-                ? 'border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-400'
-                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                ? 'border-primary-600 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
             <Lock className="w-5 h-5" />
@@ -189,7 +189,7 @@ export default function Profile() {
         <div className="card space-y-6">
           {/* Profile Photo */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-4">
               Profile Photo
             </label>
             <div className="flex items-center gap-6">
@@ -198,11 +198,11 @@ export default function Profile() {
                   <img
                     src={photoPreview}
                     alt="Profile"
-                    className="w-32 h-32 rounded-full object-cover border-4 border-gray-200 dark:border-gray-600"
+                    className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
                   />
                 ) : (
-                  <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center border-4 border-gray-300 dark:border-gray-600">
-                    <User className="w-16 h-16 text-gray-400 dark:text-gray-500" />
+                  <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center border-4 border-gray-300">
+                    <User className="w-16 h-16 text-gray-400" />
                   </div>
                 )}
               </div>
@@ -226,7 +226,7 @@ export default function Profile() {
                     Delete
                   </button>
                 )}
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-500">
                   JPG, JPEG or PNG. Max size 2MB
                 </p>
               </div>
@@ -236,7 +236,7 @@ export default function Profile() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 <User className="w-4 h-4 inline mr-1" />
                 Full Name
               </label>
@@ -251,7 +251,7 @@ export default function Profile() {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Mail className="w-4 h-4 inline mr-1" />
                 Email
               </label>
@@ -266,7 +266,7 @@ export default function Profile() {
 
             {/* Phone */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Phone className="w-4 h-4 inline mr-1" />
                 Phone Number
               </label>
@@ -282,7 +282,7 @@ export default function Profile() {
             {/* Company Name (for providers) */}
             {user?.role === 'provider' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   <Building2 className="w-4 h-4 inline mr-1" />
                   Company Name
                 </label>
@@ -315,7 +315,7 @@ export default function Profile() {
           {/* Company Address (for providers) */}
           {user?.role === 'provider' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Building2 className="w-4 h-4 inline mr-1" />
                 Company Address
               </label>
@@ -330,7 +330,7 @@ export default function Profile() {
           )}
 
           {/* Save Button */}
-          <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex justify-end pt-4 border-t">
             <button
               onClick={handleSaveProfile}
               disabled={saving}
@@ -347,8 +347,8 @@ export default function Profile() {
       {activeTab === 'password' && (
         <div className="card space-y-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Change Password</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+            <h3 className="text-lg font-semibold">Change Password</h3>
+            <p className="text-gray-600 text-sm mt-1">
               Ensure your password is at least 8 characters long
             </p>
           </div>
@@ -356,7 +356,7 @@ export default function Profile() {
           <div className="space-y-4 max-w-md">
             {/* Current Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Current Password
               </label>
               <input
@@ -370,7 +370,7 @@ export default function Profile() {
 
             {/* New Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 New Password
               </label>
               <input
@@ -384,7 +384,7 @@ export default function Profile() {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Confirm New Password
               </label>
               <input
@@ -397,9 +397,9 @@ export default function Profile() {
             </div>
 
             {/* Password Requirements */}
-            <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password requirements:</h4>
-              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1 list-disc list-inside">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-700 mb-2">Password requirements:</h4>
+              <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
                 <li>Minimum 8 characters long</li>
                 <li>Recommended: Mix of letters, numbers, and symbols</li>
               </ul>
