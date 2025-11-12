@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
+import PageHeader from '../components/PageHeader';
 import { profileAPI, authAPI } from '../lib/api';
 import useAuthStore from '../store/useAuthStore';
 import { toast } from 'sonner';
@@ -83,7 +84,7 @@ function Profile() {
   return (
     <Layout>
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">My Profile</h1>
+        <PageHeader title="My Profile" />
 
         <div className="grid md:grid-cols-3 gap-6">
           {/* Left column: avatar */}
@@ -129,7 +130,7 @@ function Profile() {
 
         {/* Change password */}
         <div className="card mt-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Change Password</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Change Password</h2>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>

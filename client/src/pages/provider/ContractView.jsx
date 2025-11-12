@@ -93,15 +93,15 @@ function ProviderContractView() {
         <div className="card mb-6">
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">{contract.title}</h1>
-              <p className="text-gray-600">Contract # {contract.contract_number}</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">{contract.title}</h1>
+              <p className="text-gray-600 dark:text-gray-400">Contract # {contract.contract_number}</p>
             </div>
             <StatusBadge status={contract.status} />
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 mb-6">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Contract Period</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Contract Period</p>
               <p className="font-medium">
                 {contract.start_date && contract.end_date ? (
                   <>
@@ -111,13 +111,13 @@ function ProviderContractView() {
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600 mb-1">Contract Value</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Contract Value</p>
               <p className="font-medium">
                 {contract.amount ? `${contract.amount.toLocaleString()} ${contract.currency}` : 'Not specified'}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600 mb-1">Signed Date</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Signed Date</p>
               <p className="font-medium">
                 {contract.signed_at ? new Date(contract.signed_at).toLocaleDateString() : 'Not signed yet'}
               </p>
@@ -156,7 +156,7 @@ function ProviderContractView() {
 
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Contract Details</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Contract Details</h2>
             <button onClick={handleDownload} className="btn btn-secondary">
               <Download size={18} />
               <span>Download</span>
@@ -165,7 +165,7 @@ function ProviderContractView() {
 
           <div className="prose max-w-none">
             <div 
-              className="border border-gray-200 rounded-lg p-6 bg-white"
+              className="border border-gray-200 dark:border-gray-800 rounded-lg p-6 bg-white dark:bg-gray-900"
               dangerouslySetInnerHTML={{ __html: contract.content }}
             />
           </div>

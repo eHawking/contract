@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Loader2, ArrowLeft } from 'lucide-react';
 import Layout from '../../components/Layout';
+import PageHeader from '../../components/PageHeader';
 import { usersAPI } from '../../lib/api';
 import { toast } from 'sonner';
 
@@ -41,7 +42,7 @@ function AdminUserForm() {
           <span>Back</span>
         </button>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Add Service Provider</h1>
+        <PageHeader title="Add Service Provider" />
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="card">

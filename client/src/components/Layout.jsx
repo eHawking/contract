@@ -22,6 +22,7 @@ function Layout({ children }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [publicSettings, setPublicSettings] = React.useState(null);
+  const [userMenuOpen, setUserMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
     (async () => {
@@ -140,6 +141,57 @@ function Layout({ children }) {
 
       {/* Main content */}
       <main className="lg:ml-64 min-h-screen">
+        {/* Top header */}
+        <div className="sticky top-0 z-30 bg-white/70 dark:bg-gray-950/70 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-gray-200 dark:border-gray-800">
+          <div className="px-6 lg:px-8 py-3 flex items-center justify-end">
+            <div className="relative z-40">
+              <button
+                onClick={() => setUserMenuOpen((o) => !o)}
+                className="flex items-center gap-3 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden flex items-center justify-center">
+                  {user?.avatar_url ? (
+                    <img src={user.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                      {(user?.name || 'U').split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <div className="hidden sm:block text-left">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 leading-4">{user?.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
+                </div>
+              </button>
+
+              {userMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setUserMenuOpen(false)} />
+                  <div className="absolute right-0 mt-2 w-56 card p-2 z-40">
+                    <Link to="/profile" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                      <User size={16} />
+                      <span>Profile</span>
+                    </Link>
+                    {isAdmin && (
+                      <Link to="/admin/settings" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                        <Settings size={16} />
+                        <span>Settings</span>
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                    >
+                      <LogOut size={16} />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
         <div className="p-6 lg:p-8">
           {children}
         </div>

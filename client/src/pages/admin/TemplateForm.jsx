@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Save, Loader2, ArrowLeft } from 'lucide-react';
 import Layout from '../../components/Layout';
+import PageHeader from '../../components/PageHeader';
 import { templatesAPI, aiAPI } from '../../lib/api';
 import { toast } from 'sonner';
 
@@ -111,9 +112,7 @@ function AdminTemplateForm() {
           <span>Back</span>
         </button>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          {isEdit ? 'Edit Template' : 'Create New Template'}
-        </h1>
+        <PageHeader title={isEdit ? 'Edit Template' : 'Create New Template'} />
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="card">
@@ -176,7 +175,7 @@ function AdminTemplateForm() {
           </div>
 
           <div className="card">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Template Content *</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Template Content *</h2>
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 AI Generation

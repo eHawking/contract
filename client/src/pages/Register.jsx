@@ -34,29 +34,29 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-950 dark:to-gray-900 p-4">
       <div className="w-full max-w-2xl">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl p-8">
           {/* Logo */}
           <div className="flex justify-center mb-6">
             <div className="flex items-center gap-3">
-              <Building2 className="text-primary-600" size={48} />
+              <Building2 className="text-primary-600 dark:text-primary-400" size={48} />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">AEMCO</h1>
-                <p className="text-sm text-gray-500">Contract Builder</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">AEMCO</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Contract Builder</p>
               </div>
             </div>
           </div>
 
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Service Provider Registration</h2>
-            <p className="text-gray-600">Create your account to start working with AEMCO</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Service Provider Registration</h2>
+            <p className="text-gray-600 dark:text-gray-400">Create your account to start working with AEMCO</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Full Name *
                 </label>
                 <div className="relative">
@@ -73,7 +73,7 @@ function Register() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Email Address *
                 </label>
                 <div className="relative">
@@ -91,7 +91,7 @@ function Register() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Company Name *
               </label>
               <div className="relative">
@@ -109,7 +109,7 @@ function Register() {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Phone Number *
                 </label>
                 <div className="relative">
@@ -126,7 +126,7 @@ function Register() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Commercial Registration
                 </label>
                 <div className="relative">
@@ -143,7 +143,7 @@ function Register() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Address *
               </label>
               <div className="relative">
@@ -160,7 +160,7 @@ function Register() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Password * (minimum 8 characters)
               </label>
               <div className="relative">
@@ -194,7 +194,7 @@ function Register() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               Already have an account?{' '}
               <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium">
                 Sign In

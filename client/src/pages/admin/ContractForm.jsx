@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Save, Send, Loader2, ArrowLeft } from 'lucide-react';
 import Layout from '../../components/Layout';
+import PageHeader from '../../components/PageHeader';
 import { contractsAPI, templatesAPI, usersAPI, aiAPI } from '../../lib/api';
 import { toast } from 'sonner';
 
@@ -159,13 +160,11 @@ function AdminContractForm() {
           <span>Back</span>
         </button>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          {isEdit ? 'Edit Contract' : 'Create New Contract'}
-        </h1>
+        <PageHeader title={isEdit ? 'Edit Contract' : 'Create New Contract'} />
 
         <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-6">
           <div className="card">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Basic Information</h2>
             
             <div className="grid md:grid-cols-2 gap-6 mb-6">
               <div>
@@ -260,7 +259,7 @@ function AdminContractForm() {
           </div>
 
           <div className="card">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Contract Content *</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Contract Content *</h2>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">AI Assist (optional)</label>
               <div className="grid md:grid-cols-3 gap-4 items-end">
@@ -292,7 +291,7 @@ function AdminContractForm() {
           </div>
 
           <div className="card">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Notes (Internal)</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Notes (Internal)</h2>
             <textarea
               className="textarea"
               rows="4"

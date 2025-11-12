@@ -35,28 +35,28 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-950 dark:to-gray-900 p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl p-8">
           {/* Logo */}
           <div className="flex justify-center mb-8">
             <div className="flex items-center gap-3">
-              <Building2 className="text-primary-600" size={48} />
+              <Building2 className="text-primary-600 dark:text-primary-400" size={48} />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">AEMCO</h1>
-                <p className="text-sm text-gray-500">Contract Builder</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">AEMCO</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Contract Builder</p>
               </div>
             </div>
           </div>
 
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-            <p className="text-gray-600">Sign in to your account</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Welcome Back</h2>
+            <p className="text-gray-600 dark:text-gray-400">Sign in to your account</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email Address
               </label>
               <div className="relative">
@@ -73,7 +73,7 @@ function Login() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -106,7 +106,7 @@ function Login() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               Don't have an account?{' '}
               <Link to="/register" className="text-primary-600 hover:text-primary-700 font-medium">
                 Register as Service Provider
@@ -114,7 +114,7 @@ function Login() {
             </p>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-gray-200 text-center text-xs text-gray-500">
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800 text-center text-xs text-gray-500 dark:text-gray-400">
             <p>AHMED ESSA CONSTRUCTION & TRADING (AEMCO)</p>
             <p>6619, King Fahd Road, Dammam, 32243, Saudi Arabia</p>
           </div>
