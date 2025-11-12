@@ -10,7 +10,20 @@ const { logAudit } = require('../middleware/audit');
 
 const router = express.Router();
 
-// Public settings (no auth)
+router.use(authenticateToken, requireAdmin);
+
+router.get('/', async (req, res) => {
+  const conn = await pool.getConnection();
+  try {
+    const [settings] = await conn.query('SELECT * FROM app_settings WHERE id = 1');
+    res.json({ settings });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load settings' });
+  } finally {
+    conn.release();
+  }
+});
+
 router.get('/public', async (req, res) => {
   const conn = await pool.getConnection();
   try {
@@ -23,22 +36,7 @@ router.get('/public', async (req, res) => {
   }
 });
 
-// Authenticated admin: get all settings
-router.get('/', authenticateToken, requireAdmin, async (req, res) => {
-  const conn = await pool.getConnection();
-  try {
-    const [settings] = await conn.query('SELECT * FROM app_settings WHERE id = 1');
-    res.json({ settings });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to load settings' });
-  } finally {
-    conn.release();
-  }
-});
-
 router.put('/', [
-  authenticateToken,
-  requireAdmin,
   body('company_name').optional().isString().trim(),
   body('company_address').optional().isString(),
   body('company_phone').optional().isString(),
@@ -98,7 +96,7 @@ const upload = multer({
   }
 });
 
-router.post('/logo', authenticateToken, requireAdmin, upload.single('logo'), async (req, res) => {
+router.post('/logo', upload.single('logo'), async (req, res) => {
   const conn = await pool.getConnection();
   try {
     const rel = `/uploads/logos/${path.basename(req.file.path)}`;

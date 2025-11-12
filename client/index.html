@@ -4,8 +4,27 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#0ea5e9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
     <meta name="description" content="Contract Builder for AHMED ESSA CONSTRUCTION & TRADING (AEMCO)" />
     <title>AEMCO Contract Builder</title>
+    <script>
+      (function() {
+        try {
+          var ls = localStorage.getItem('theme-storage');
+          var theme = 'light';
+          if (ls) {
+            var parsed = JSON.parse(ls);
+            var st = (parsed && parsed.state) ? parsed.state : parsed;
+            if (st && typeof st === 'object' && st.theme) theme = st.theme;
+          } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            theme = 'dark';
+          }
+          if (theme === 'dark') document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

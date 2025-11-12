@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore';
 import { settingsAPI } from '../lib/api';
+import ThemeToggle from './ThemeToggle';
 
 function Layout({ children }) {
   const { user, logout } = useAuthStore();
@@ -52,12 +53,12 @@ function Layout({ children }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Mobile menu button */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 rounded-lg bg-white shadow-lg border border-gray-200"
+          className="p-2 rounded-lg bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-800"
         >
           {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -65,23 +66,26 @@ function Layout({ children }) {
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 z-40 h-screen w-64 bg-white border-r border-gray-200 
+        fixed top-0 left-0 z-40 h-screen w-64 bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 
         transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center gap-3">
-              {publicSettings?.logo_url ? (
-                <img src={publicSettings.logo_url} alt="Logo" className="w-8 h-8 object-contain" />
-              ) : (
-                <Building2 className="text-primary-600" size={32} />
-              )}
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">{publicSettings?.company_name || 'AEMCO'}</h1>
-                <p className="text-xs text-gray-500">Contract Builder</p>
+          <div className="p-6 border-b border-gray-200 dark:border-gray-800">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                {publicSettings?.logo_url ? (
+                  <img src={publicSettings.logo_url} alt="Logo" className="w-8 h-8 object-contain" />
+                ) : (
+                  <Building2 className="text-primary-600 dark:text-primary-400" size={32} />
+                )}
+                <div>
+                  <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">{publicSettings?.company_name || 'AEMCO'}</h1>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Contract Builder</p>
+                </div>
               </div>
+              <ThemeToggle />
             </div>
           </div>
 
@@ -99,8 +103,8 @@ function Layout({ children }) {
                   className={`
                     flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
                     ${isActive 
-                      ? 'bg-primary-50 text-primary-700 font-medium' 
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 font-medium' 
+                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800'
                     }
                   `}
                 >
@@ -112,10 +116,10 @@ function Layout({ children }) {
           </nav>
 
           {/* User info */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-gray-200 dark:border-gray-800">
             <div className="mb-3 px-2">
-              <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-              <p className="text-xs text-gray-500">{user?.email}</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
               <span className={`
                 inline-block mt-2 px-2 py-0.5 text-xs font-medium rounded-full
                 ${isAdmin ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}
@@ -125,7 +129,7 @@ function Layout({ children }) {
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
               <LogOut size={18} />
               <span>Logout</span>
