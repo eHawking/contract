@@ -64,6 +64,38 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get contract PDF (admin)
+router.get('/:id/pdf', [
+  param('id').isInt(),
+  validate
+], async (req, res) => {
+  const conn = await pool.getConnection();
+  try {
+    const [contract] = await conn.query(
+      `SELECT c.*,
+              u.name as provider_name,
+              u.company_name as provider_company
+       FROM contracts c
+       LEFT JOIN users u ON c.provider_id = u.id
+       WHERE c.id = ?`,
+      [req.params.id]
+    );
+
+    if (!contract) {
+      return res.status(404).json({ error: 'Contract not found' });
+    }
+
+    // TODO: Replace with actual PDF generation. For now, return HTML content.
+    res.setHeader('Content-Type', 'text/html');
+    res.send(contract.content);
+  } catch (err) {
+    console.error('Get admin contract PDF error:', err);
+    res.status(500).json({ error: 'Failed to generate PDF' });
+  } finally {
+    conn.release();
+  }
+});
+
 // Get contract by ID
 router.get('/:id', [
   param('id').isInt(),
