@@ -17,6 +17,7 @@ router.get('/public', async (req, res) => {
     const [settings] = await conn.query('SELECT company_name, company_address, company_phone, company_email, company_website, logo_url FROM app_settings WHERE id = 1');
     res.json({ settings });
   } catch (err) {
+    console.error('Settings /public error:', err);
     res.status(500).json({ error: 'Failed to load public settings' });
   } finally {
     conn.release();
@@ -32,6 +33,7 @@ router.get('/', async (req, res) => {
     const [settings] = await conn.query('SELECT * FROM app_settings WHERE id = 1');
     res.json({ settings });
   } catch (err) {
+    console.error('Settings / error:', err);
     res.status(500).json({ error: 'Failed to load settings' });
   } finally {
     conn.release();
@@ -72,6 +74,7 @@ router.put('/', [
     const [settings] = await conn.query('SELECT * FROM app_settings WHERE id = 1');
     res.json({ message: 'Settings updated', settings });
   } catch (err) {
+    console.error('Settings PUT error:', err);
     res.status(500).json({ error: 'Failed to update settings' });
   } finally {
     conn.release();
@@ -106,6 +109,7 @@ router.post('/logo', upload.single('logo'), async (req, res) => {
     await logAudit(req.user.id, 'UPLOAD_LOGO', 'app_settings', 1, { logo_url: rel }, req);
     res.json({ message: 'Logo updated', logo_url: rel });
   } catch (err) {
+    console.error('Settings logo upload error:', err);
     res.status(500).json({ error: 'Failed to upload logo' });
   } finally {
     conn.release();
