@@ -15,6 +15,7 @@ import AdminTemplates from './pages/admin/Templates';
 import AdminTemplateForm from './pages/admin/TemplateForm';
 import AdminUsers from './pages/admin/Users';
 import AdminUserForm from './pages/admin/UserForm';
+import AdminContractView from './pages/admin/ContractView';
 import AdminSettings from './pages/admin/Settings';
 
 // Provider pages
@@ -105,6 +106,14 @@ function App() {
           } 
         />
         <Route 
+          path="/admin/contracts/:id/view" 
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminContractView />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
           path="/admin/templates" 
           element={
             <ProtectedRoute requiredRole="admin">
@@ -138,6 +147,14 @@ function App() {
         />
         <Route 
           path="/admin/users/new" 
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminUserForm />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/users/:id/edit" 
           element={
             <ProtectedRoute requiredRole="admin">
               <AdminUserForm />

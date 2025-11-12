@@ -90,9 +90,12 @@ function AdminContracts() {
               ) },
               { header: 'Title', key: 'title' },
               { header: 'Provider', key: 'provider', render: (c) => (c.provider_company || c.provider_name), cellClassName: 'text-sm' },
-              { header: 'Amount', key: 'amount', render: (c) => (c.amount ? `${c.amount.toLocaleString()} ${c.currency}` : '-'), cellClassName: 'text-sm' },
+              { header: 'Amount', key: 'amount', render: (c) => (c.amount ? `${c.amount.toLocaleString()} ${c.currency}` : '-') , cellClassName: 'text-sm' },
               { header: 'Status', key: 'status', render: (c) => (<StatusBadge status={c.status} />) },
-              { header: 'Date', key: 'created_at', render: (c) => new Date(c.created_at).toLocaleDateString(), cellClassName: 'text-sm text-gray-600 dark:text-gray-400' }
+              { header: 'Date', key: 'created_at', render: (c) => new Date(c.created_at).toLocaleDateString(), cellClassName: 'text-sm text-gray-600 dark:text-gray-400' },
+              { header: 'Actions', key: 'actions', render: (c) => (
+                <Link to={`/admin/contracts/${c.id}/view`} className="text-primary-600 hover:text-primary-700 font-medium">View →</Link>
+              ) }
             ]}
             data={filteredContracts}
             rowKey="id"

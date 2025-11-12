@@ -49,7 +49,8 @@ export const contractsAPI = {
   create: (data) => api.post('/contracts', data),
   update: (id, data) => api.put(`/contracts/${id}`, data),
   delete: (id) => api.delete(`/contracts/${id}`),
-  send: (id) => api.post(`/contracts/${id}/send`)
+  send: (id) => api.post(`/contracts/${id}/send`),
+  downloadPDF: (id) => api.get(`/contracts/${id}/pdf`, { responseType: 'blob' })
 };
 
 // Templates API

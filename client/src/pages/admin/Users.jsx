@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, CheckCircle, XCircle } from 'lucide-react';
+import { Plus, CheckCircle, XCircle, Edit, Trash2 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import EmptyState from '../../components/EmptyState';
@@ -14,6 +14,7 @@ function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [confirm, setConfirm] = useState({ open: false, action: null, user: null });
+  const [confirmDelete, setConfirmDelete] = useState({ open: false, user: null });
 
   useEffect(() => {
     loadUsers();
@@ -50,6 +51,16 @@ function AdminUsers() {
     }
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await usersAPI.delete(id);
+      toast.success('Provider deleted');
+      loadUsers();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Deletion failed');
+    }
+  };
+
   return (
     <Layout>
       <div className="max-w-7xl mx-auto">
@@ -74,6 +85,10 @@ function AdminUsers() {
               { header: 'Status', key: 'status', render: (u) => (<StatusBadge status={u.status} />) },
               { header: 'Actions', key: 'actions', render: (u) => (
                 <div className="flex gap-2">
+                  <Link to={`/admin/users/${u.id}/edit`} className="btn btn-secondary btn-sm hidden md:inline-flex">
+                    <Edit size={16} />
+                    <span>Edit</span>
+                  </Link>
                   {u.status === 'pending' && (
                     <button
                       onClick={() => setConfirm({ open: true, action: 'approve', user: u })}
@@ -101,6 +116,13 @@ function AdminUsers() {
                       <CheckCircle size={20} />
                     </button>
                   )}
+                  <button
+                    onClick={() => setConfirmDelete({ open: true, user: u })}
+                    className="text-red-600 hover:text-red-700"
+                    title="Delete"
+                  >
+                    <Trash2 size={20} />
+                  </button>
                 </div>
               ) }
             ]}
@@ -135,6 +157,23 @@ function AdminUsers() {
               if (confirm.action === 'activate') await handleStatusChange(confirm.user.id, 'active');
             } finally {
               setConfirm({ open: false, action: null, user: null });
+            }
+          }}
+        />
+
+        <ConfirmDialog
+          open={confirmDelete.open}
+          onOpenChange={(o) => setConfirmDelete((c) => ({ ...c, open: o }))}
+          title="Delete provider?"
+          description="This action cannot be undone. The provider and related access will be removed."
+          confirmText="Delete"
+          variant="danger"
+          onConfirm={async () => {
+            try {
+              if (!confirmDelete.user) return;
+              await handleDelete(confirmDelete.user.id);
+            } finally {
+              setConfirmDelete({ open: false, user: null });
             }
           }}
         />

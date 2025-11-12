@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Save, Loader2, ArrowLeft } from 'lucide-react';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
-import { templatesAPI, aiAPI } from '../../lib/api';
+import { templatesAPI, aiAPI, settingsAPI } from '../../lib/api';
 import { toast } from 'sonner';
 
 function AdminTemplateForm() {
@@ -14,6 +14,7 @@ function AdminTemplateForm() {
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(isEdit);
   const [aiLoading, setAiLoading] = useState(false);
+  const [geminiEnabled, setGeminiEnabled] = useState(false);
   const [ai, setAi] = useState({
     description: '',
     placeholders: '',
@@ -30,6 +31,13 @@ function AdminTemplateForm() {
 
   useEffect(() => {
     if (isEdit) loadTemplate();
+    // Check Gemini availability
+    (async () => {
+      try {
+        const { data } = await settingsAPI.get();
+        setGeminiEnabled(!!data.settings?.gemini_api_key);
+      } catch {}
+    })();
   }, [id]);
 
   const loadTemplate = async () => {
@@ -176,45 +184,52 @@ function AdminTemplateForm() {
 
           <div className="card">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Template Content *</h2>
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                AI Generation
-              </label>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
-                  </label>
-                  <textarea
-                    className="textarea"
-                    rows="3"
-                    value={ai.description}
-                    onChange={(e) => setAi({ ...ai, description: e.target.value })}
-                    placeholder="Enter a short description..."
-                  />
+            {geminiEnabled ? (
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  AI Generation
+                </label>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Description
+                    </label>
+                    <textarea
+                      className="textarea"
+                      rows="3"
+                      value={ai.description}
+                      onChange={(e) => setAi({ ...ai, description: e.target.value })}
+                      placeholder="Enter a short description..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Placeholders (comma separated)
+                    </label>
+                    <input
+                      type="text"
+                      className="input"
+                      value={ai.placeholders}
+                      onChange={(e) => setAi({ ...ai, placeholders: e.target.value })}
+                      placeholder="e.g., provider_name, amount, start_date"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Placeholders (comma separated)
-                  </label>
-                  <input
-                    type="text"
-                    className="input"
-                    value={ai.placeholders}
-                    onChange={(e) => setAi({ ...ai, placeholders: e.target.value })}
-                    placeholder="e.g., provider_name, amount, start_date"
-                  />
-                </div>
+                <button
+                  type="button"
+                  disabled={aiLoading}
+                  className="btn btn-secondary"
+                  onClick={handleGenerateAI}
+                >
+                  {aiLoading ? <Loader2 size={20} className="animate-spin" /> : 'Generate'}
+                </button>
               </div>
-              <button
-                type="button"
-                disabled={aiLoading}
-                className="btn btn-secondary"
-                onClick={handleGenerateAI}
-              >
-                {aiLoading ? <Loader2 size={20} className="animate-spin" /> : 'Generate'}
-              </button>
-            </div>
+            ) : (
+              <div className="mb-6 rounded-lg bg-yellow-50 border border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800 p-4 text-sm text-yellow-800 dark:text-yellow-200">
+                Enable Gemini in Settings to generate content with AI.
+                <a href="/admin/settings" className="ml-2 underline text-yellow-900 dark:text-yellow-100">Open Settings →</a>
+              </div>
+            )}
             <textarea
               required
               className="textarea font-mono text-sm"
